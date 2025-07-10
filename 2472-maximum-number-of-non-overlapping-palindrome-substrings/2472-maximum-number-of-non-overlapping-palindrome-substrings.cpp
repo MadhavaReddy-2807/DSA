@@ -2,7 +2,7 @@ class Solution {
 public:
 vector<vector<int>>ispalin;
 vector<int>dp;
-int func(int index,string s,int k)
+int func(int index,string &s,int k)
 {
     if(index>=s.length())
     {
