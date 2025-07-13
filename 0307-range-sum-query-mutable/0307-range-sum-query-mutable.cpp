@@ -1,58 +1,75 @@
 class NumArray {
 public:
-    vector<int> seg;
-    vector<int> rough;
-
-    void build(int l, int r, int i, vector<int>& nums) {
-        if (l == r) {
-            seg[i] = nums[l];
-            return;
-        }
-        int mid = (l + r) / 2;
-        build(l, mid, 2 * i + 1, nums);
-        build(mid + 1, r, 2 * i + 2, nums);
-        seg[i] = seg[2 * i + 1] + seg[2 * i + 2];
+vector<int>seg;
+vector<int>rough;
+void build(int l,int r,int i,vector<int>&nums)
+{
+    if(l==r)
+    {
+        seg[i]=nums[l];
+        return;
     }
-
+    else
+    {
+        int mid=(l+r)/2;
+        build(l,mid,2*i+1,nums);
+        build(mid+1,r,2*i+2,nums);
+        seg[i]=seg[2*i+1]+seg[2*i+2];
+    }
+}
     NumArray(vector<int>& nums) {
-        int n = nums.size();
-        seg.resize(4 * n, 0);
-        rough.assign(nums.begin(), nums.end());
-        if (n > 0) build(0, n - 1, 0, nums);
+        seg.resize(nums.size()*4,0);
+        rough.assign(nums.begin(),nums.end());
+        build(0,nums.size()-1,0,nums);
     }
-
-    void updateseg(int index, int val, int l, int r, int i) {
-        if (l == r) {
-            seg[i] += val;
-            return;
+void updateseg(int index,int val,int l,int r,int i)
+{
+    if(l==r)
+    {
+        seg[i]+=val;
+        return;
+    }
+    else
+    {
+        seg[i]+=val;
+        int mid=(l+r)/2;
+        if(index<=mid)
+        {
+            updateseg(index,val,l,mid,2*i+1);
         }
-        seg[i] += val; // propagate delta
-        int mid = (l + r) / 2;
-        if (index <= mid) {
-            updateseg(index, val, l, mid, 2 * i + 1);
-        } else {
-            updateseg(index, val, mid + 1, r, 2 * i + 2);
+        else
+        {
+            updateseg(index,val,mid+1,r,2*i+2);
         }
     }
-
+}
     void update(int index, int val) {
-        // subtract old value
-        updateseg(index, -rough[index], 0, rough.size() - 1, 0);
-        // add new value
-        updateseg(index, val, 0, rough.size() - 1, 0);
-        rough[index] = val; // update original array
+        updateseg(index,-rough[index],0,rough.size()-1,0);
+        updateseg(index,val,0,rough.size()-1,0);
     }
-
-    int sumrangeseg(int ql, int qr, int l, int r, int index) {
-        if (qr < l || r < ql) return 0;         // no overlap
-        if (ql <= l && r <= qr) return seg[index]; // total overlap
-
-        int mid = (l + r) / 2;
-        return sumrangeseg(ql, qr, l, mid, 2 * index + 1) +
-               sumrangeseg(ql, qr, mid + 1, r, 2 * index + 2);
+int sumrangeseg(int l,int r,int start,int end,int index)
+{
+    if(l>end||start>r)
+    {
+        return 0;
     }
-
+    if(l<=start&&end<=r)
+    {
+        return seg[index];
+    }
+    int mid=(start+end)/2;
+    return sumrangeseg(l,r,start,mid,2*index+1)+sumrangeseg(l,r,mid+1,end,2*index+2);
+}
     int sumRange(int left, int right) {
-        return sumrangeseg(left, right, 0, rough.size() - 1, 0);
+        return sumrangeseg(left,right,0,rough.size()-1,0);
     }
 };
+
+/**
+ * Your NumArray object will be instantiated and called as such:
+ * NumArray* obj = new NumArray(nums);
+ * obj->update(index,val);
+ * int param_2 = obj->sumRange(left,right);
+ */
+
+
