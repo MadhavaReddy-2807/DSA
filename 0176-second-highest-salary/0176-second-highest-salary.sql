@@ -1,7 +1,5 @@
 # Write your MySQL query statement below
-SELECT(
-    SELECT DISTINCT  salary
-    FROM employee
-    ORDER BY salary DESC
-    LIMIT 1 OFFSET 1 
-) AS  SecondHighestSalary 
+select sum(a.SecondHighestSalary) as SecondHighestSalary
+from (select distinct(e.salary) as SecondHighestSalary
+from employee e
+limit 1 offset 1) as a
