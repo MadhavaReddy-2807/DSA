@@ -4,7 +4,7 @@ public:
       map<int,int>mp;
       for(int i=0;i<arr.size();i++)
       {
-        mp[arr[i]%k]++;
+        mp[(((arr[i]+k)%k)+k)%k]++;
       }
       if(k%2==0)
         {
