@@ -1,51 +1,63 @@
 class Solution {
 public:
-    int numBusesToDestination(vector<vector<int>>& routes, int source, int target) {
-        map<int,vector<int>>mp;
-        for(int i=0;i<routes.size();i++)
+vector<int>dp;
+long long dfs( map<int,vector<int>>&buses,vector<vector<int>>& routes,int src,int tar)
+{
+    if(src==tar)
+    {
+        return 0;
+    }
+    // for all buses coming in that route
+    long long ans=INT_MAX;
+    for(int bus:buses[src])
+    {
+        if(dp[bus]==-1)
         {
-            for(int j=0;j<routes[i].size();j++)
+            //for all the routes that the bus goes
+            dp[bus]=1;
+            for(int route:routes[bus])
             {
-                mp[routes[i][j]].push_back(i);//bus that come to that busstop
+                ans=min(ans,1+dfs(buses,routes,route,tar));
             }
         }
-        if(source==target)
-        {
-            return 1;
-        }
-        queue<int>q;
-        vector<int>visited(routes.size(),false);
-        for(int i=0;i<mp[source].size();i++)
-        {
-            visited[mp[source][i]]=true;
-            q.push({mp[source][i]});//buses that go from that busstop
-        }
-        int count=0;
-        while(!q.empty())
-        {
-            count++;
-            int x=q.size();
-            while(x--)
+    }
+    return ans;
+}
+    int numBusesToDestination(vector<vector<int>>& routes, int source, int target) {
+         map<int,vector<int>>buses;
+         int n=routes.size();
+         dp.resize(n,-1);
+         for(int i=0;i<routes.size();i++)
+         {
+            for(auto route:routes[i])
+            buses[route].push_back(i);
+         }
+         queue<pair<int,int>>q;
+         q.push({source,0});
+         while(!q.empty())
+         {
+            auto node=q.front();
+            q.pop();
+            int route=node.first;
+            int steps=node.second;
+            if(route==target)
             {
-                int bus=q.front();
-                q.pop();
-                for(auto stop:routes[bus])//what are the stops that can be reached from that bus
+                return steps;
+            }
+             for(int bus:buses[route])
                 {
-                    if(stop==target)
+                    if(dp[bus]==-1)
                     {
-                        return count;
-                    }
-                    for(auto next:mp[stop])//what buses come to that stop
-                    {
-                        if(!visited[next])
+                        //for all the routes that the bus goes
+                        dp[bus]=1;
+                        for(int x:routes[bus])
                         {
-                            visited[next]=1;
-                            q.push(next);
+                           q.push({x,1+steps});
                         }
                     }
-                }
-            }
-        }
-        return -1;
+                 }
+            
+         }
+         return -1;
     }
 };
