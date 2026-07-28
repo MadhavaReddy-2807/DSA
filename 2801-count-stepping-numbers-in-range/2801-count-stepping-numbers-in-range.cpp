@@ -1,52 +1,56 @@
 class Solution {
 public:
-long long dp[100][2][15];
-const int mod=1e9+7;
-long long func(string s,int index,int tight,int prev)
-{
-    if(index>=s.length())
+long long  dp[101][3][3][11][3];
+int mod=1e9+7;
+  int func(string& low,string& high,int index,int ltight,int rtight,int prev,int start)
+  {
+    if(index==high.size())
     {
-        return 1;
+        return start;
     }
-    if(dp[index][tight][prev+1]!=-1)
+    int llimit=ltight?low[index]-'0':0;
+    int rlimit=rtight?high[index]-'0':9;
+    long long ans=0;
+    if(dp[index][ltight][rtight][prev+1][start]!=-1)
     {
-        return dp[index][tight][prev+1];
+        return dp[index][ltight][rtight][prev+1][start];
     }
-    int limit=tight==1?s[index]-'0':9;
-    long long  ways=0;
-    for(int i=0;i<=limit;i++)
+    for(int i=llimit;i<=rlimit;i++)
     {
-        int newtight=tight&&(i==limit);
-        if(prev==-1&&i==0)
+        int nltight=(ltight)&&(low[index]-'0'==i);
+        int nrtight=(rtight)&&(high[index]-'0'==i);
+        if(prev==-1)
         {
-          ways+=func(s,index+1,newtight,-1);
-          ways=ways%mod;
-        }
-        else if(prev==-1)
-        {
-            ways+=func(s,index+1,newtight,i);
-            ways=ways%mod;
+            if(i!=0)
+            {
+                ans+=func(low,high,index+1,nltight,nrtight,i,1);
+                ans=ans%mod;
+
+            }
+            else
+            {
+                ans+=func(low,high,index+1,nltight,nrtight,prev,0);
+                ans=ans%mod;
+
+            }
         }
         else
         {
             if(abs(prev-i)==1)
             {
-              ways+=func(s,index+1,newtight,i);
-              ways=ways%mod;
+              ans+=func(low,high,index+1,nltight,nrtight,i,1);
+              ans=ans%mod;
             }
         }
     }
-    return dp[index][tight][prev+1]=ways;
-}
+    return dp[index][ltight][rtight][prev+1][start]=ans%mod;
+  }
     int countSteppingNumbers(string low, string high) {
+        while(low.size()!=high.size())
+        {
+            low='0'+low;
+        }
         memset(dp,-1,sizeof(dp));
-        low[low.length()-1]=low[low.length()-1]-1;
-        // long long  x=stol(low);
-        // low=to_string(x-1);
-        long long a=func(high,0,1,-1);
-        memset(dp,-1,sizeof(dp));
-        long long b=func(low,0,1,-1);
-        return (a-b+mod)%mod;
-        
+        return func(low,high,0,1,1,-1,0);
     }
 };
