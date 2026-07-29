@@ -1,51 +1,41 @@
 class Solution {
 public:
-vector<int>list;
-int dp[20][2][2];
-int func(string s,int index,int tight,int prev)
+int dp[10][3][3];
+int func(string &s,int index,vector<int>&digits,int tight,int start)
 {
-    if(index>=s.length())
+    if(s.length()==index)
     {
-        return prev!=-1;
+        return start;
     }
-    if(dp[index][tight][prev+1]!=-1)
+    long long ans=0;
+    if(dp[index][tight][start]!=-1)
     {
-        return dp[index][tight][prev+1];
+        return dp[index][tight][start];
     }
-    int ways=0;
+    if(!start)
+    {
+        ans+=func(s,index+1,digits,0,start);
+    }
     int limit=tight?(s[index]-'0'):9;
-    for(int i=0;i<list.size();i++)
+    for(int i=0;i<digits.size();i++)
     {
-        if(list[i]<=limit)
+        if(digits[i]>limit)
         {
-            int newtight=(tight==1)&&(list[i]==limit);
-            if(list[i]==0)
-            {
-                ways+=func(s,index+1,newtight,prev);
-            }
-            else
-            {
-                ways+=func(s,index+1,newtight,0);
-            }
+            continue;
         }
+        int ntight=tight&&(limit==digits[i]);
+        ans+=func(s,index+1,digits,ntight,1);
     }
-    return dp[index][tight][prev+1]=ways;
+    return dp[index][tight][start]=ans;
 }
     int atMostNGivenDigitSet(vector<string>& digits, int n) {
-        for(auto d:digits)
+        string s=to_string(n);
+        vector<int>nums;
+        memset(dp,-1,sizeof(dp));
+        for(auto x:digits)
         {
-            list.push_back(stoi(d));
-        }   
-        string x=to_string(n);
-        int count=0;
-        vector<string>limit={"9","99","999","9999","99999","999999","9999999","99999999","999999999","9999999999"};
-        for(int i=1;i<x.length();i++)
-        {
-            memset(dp,-1,sizeof(dp));
-            count+=func(limit[i-1],0,1,-1);
+            nums.push_back(stoi(x));
         }
-            memset(dp,-1,sizeof(dp));
-        count+=func(x,0,1,-1);
-        return count;
+        return func(s,0,nums,1,0);
     }
 };
