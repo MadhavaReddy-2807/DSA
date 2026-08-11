@@ -1,47 +1,43 @@
 class Solution {
 public:
     int slidingPuzzle(vector<vector<int>>& board) {
-        string state="";
-       for(int i=0;i<2;i++)
-       {
-        for(int j=0;j<3;j++)
+        string start="";
+        for(auto r:board)
         {
-            state+='0'+board[i][j];
-        }
-       }
-       vector<vector<int>>nei={
-        {1,3},
-        {0,2,4},
-        {1,5},
-        {0,4},
-        {1,3,5},
-        {2,4}
-       };
-       queue<pair<string,int>>q;
-       q.push({state,0});
-       unordered_set<string>visited;
-       visited.insert(state);
-       while(!q.empty())
-       {
-        auto [start,steps]=q.front();
-        q.pop();
-        int zero=start.find('0');
-        if(start=="123450")
-        {
-            return steps;
-        }
-        for(auto x:nei[zero])
-        {
-            string newstate=start;
-            swap(newstate[zero],newstate[x]);
-            if(visited.find(newstate)==visited.end())
+            for(auto e:r)
             {
-                q.push({newstate,steps+1});
-                visited.insert(newstate);
+                start+='0'+e;
             }
         }
+        vector<vector<int>>nei={
+            {1,3},{0,2,4},{1,5},{0,4},{1,3,5},{2,4}
+        };
+        unordered_set<string>st;
+        st.insert(start);
+        string target="123450";
+        queue<pair<string,int>>q;
+        q.push({start,0});
+        while(!q.empty())
+        {
+            auto x=q.front().first;
+            auto steps=q.front().second;
+            q.pop();
+            if(x==target)
+            {
+                return steps;
+            }
+            int pos=x.find('0');
+            for(auto n:nei[pos])
+            {
+                string newx=x;
+                swap(newx[n],newx[pos]);
+                if(st.find(newx)==st.end())
+                {
+                    st.insert(newx);
+                    q.push({newx,steps+1});
+                }
+            }
         }
-       
-       return -1;
+        return -1;
     }
 };
